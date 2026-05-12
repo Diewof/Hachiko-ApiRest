@@ -11,8 +11,11 @@ import com.hachiko.portal.repository.IPaisRepository;
 import com.hachiko.portal.repository.IPlanRepository;
 import com.hachiko.portal.repository.IRazaRepository;
 import com.hachiko.portal.service.IReferenciasService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.hachiko.portal.config.CacheConfig.*;
 
 import java.util.List;
 
@@ -48,6 +51,7 @@ public class ReferenciasServiceImpl implements IReferenciasService {
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_PAISES, key = "'all'")
     public List<PaisDTO> getPaises() {
         return paisRepository.findAllByOrderByNombreAsc()
                 .stream()
@@ -59,6 +63,7 @@ public class ReferenciasServiceImpl implements IReferenciasService {
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_DEPARTAMENTOS, key = "#paisId")
     public List<DepartamentoDTO> getDepartamentosByPais(Integer paisId) {
         return departamentoRepository.findByPais_PaisIdOrderByNombreAsc(paisId)
                 .stream()
@@ -71,6 +76,7 @@ public class ReferenciasServiceImpl implements IReferenciasService {
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_CIUDADES, key = "#departamentoId")
     public List<CiudadDTO> getCiudadesByDepartamento(Integer departamentoId) {
         return ciudadRepository.findByDepartamento_DepartamentoIdOrderByNombreAsc(departamentoId)
                 .stream()
@@ -83,6 +89,7 @@ public class ReferenciasServiceImpl implements IReferenciasService {
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_RAZAS, key = "'all'")
     public List<RazaDTO> getRazas() {
         return razaRepository.findAllByOrderByNombreRazaAsc()
                 .stream()
@@ -94,6 +101,7 @@ public class ReferenciasServiceImpl implements IReferenciasService {
     }
 
     @Override
+    @Cacheable(cacheNames = CACHE_PLANES, key = "'all'")
     public List<PlanDTO> getPlanes() {
         return planRepository.findAllByOrderByCostoAsc()
                 .stream()

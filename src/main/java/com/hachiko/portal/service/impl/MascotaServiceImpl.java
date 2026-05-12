@@ -16,8 +16,12 @@ import com.hachiko.portal.repository.IRazaRepository;
 import com.hachiko.portal.service.IMascotaService;
 import com.hachiko.portal.service.validation.MascotaValidator;
 import com.hachiko.portal.service.validation.ValidationResult;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.hachiko.portal.config.CacheConfig.CACHE_MASCOTAS;
 
 import java.util.List;
 
@@ -49,6 +53,7 @@ public class MascotaServiceImpl implements IMascotaService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = CACHE_MASCOTAS, key = "#propietarioId")
     public List<MascotaDTO> listByPropietario(Integer propietarioId) {
         return perroRepository
                 .findByPropietario_PropietarioIdOrderByNombreAsc(propietarioId)
@@ -72,6 +77,7 @@ public class MascotaServiceImpl implements IMascotaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_MASCOTAS, key = "#request.propietarioId")
     public MascotaDTO create(CreateMascotaRequest request) {
         // Verificar que el propietario exista.
         Propietario propietario = propietarioRepository.findById(request.getPropietarioId())
@@ -110,6 +116,7 @@ public class MascotaServiceImpl implements IMascotaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_MASCOTAS, key = "#request.propietarioId")
     public MascotaDTO update(UpdateMascotaRequest request) {
         Perro perro = perroRepository.findById(request.getPerroId())
                 .orElseThrow(() -> new ResourceNotFoundException("Mascota", request.getPerroId()));
@@ -150,6 +157,7 @@ public class MascotaServiceImpl implements IMascotaService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_MASCOTAS, key = "#propietarioId")
     public void delete(Integer perroId, Integer propietarioId) {
         if (!perroRepository.existsById(perroId)) {
             throw new ResourceNotFoundException("Mascota", perroId);

@@ -13,8 +13,11 @@ import com.hachiko.portal.service.validation.ValidationResult;
 import com.hachiko.portal.service.validation.UserValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.hachiko.portal.config.CacheConfig.CACHE_ADMIN_USUARIOS;
 
 import java.time.LocalDateTime;
 
@@ -47,6 +50,7 @@ public class RegisterServiceImpl implements IRegisterService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_ADMIN_USUARIOS, key = "'all'")
     public UsuarioDTO register(RegisterRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();

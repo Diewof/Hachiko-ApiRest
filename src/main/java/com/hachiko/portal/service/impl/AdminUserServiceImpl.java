@@ -14,8 +14,12 @@ import com.hachiko.portal.service.IAdminUserService;
 import com.hachiko.portal.service.IPropietarioService;
 import com.hachiko.portal.service.validation.UserValidator;
 import com.hachiko.portal.service.validation.ValidationResult;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.hachiko.portal.config.CacheConfig.CACHE_ADMIN_USUARIOS;
 
 import java.util.List;
 
@@ -50,6 +54,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = CACHE_ADMIN_USUARIOS, key = "'all'")
     public List<UsuarioDTO> getAllUsers() {
         return usuarioRepository.findAll()
                 .stream()
@@ -88,6 +93,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_ADMIN_USUARIOS, key = "'all'")
     public void updateUserRole(Integer userId, String role) {
         ValidationResult validation = userValidator.validateRole(role);
         if (!validation.isValid()) {
@@ -103,6 +109,7 @@ public class AdminUserServiceImpl implements IAdminUserService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_ADMIN_USUARIOS, key = "'all'")
     public void deleteUser(Integer userId) {
         if (!usuarioRepository.existsById(userId)) {
             throw new ResourceNotFoundException("Usuario", userId);

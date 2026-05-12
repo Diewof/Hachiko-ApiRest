@@ -59,6 +59,9 @@ public class SecurityConfig {
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Actuator: health público, prometheus y resto solo ADMIN
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/prometheus", "/actuator/**").hasRole("ADMIN")
                 // Rutas públicas de autenticación
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
@@ -66,6 +69,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/reset-password").permitAll()
                 // Datos de referencia (catálogos públicos)
                 .requestMatchers(HttpMethod.GET, "/api/referencia/**").permitAll()
+                // Health check público (estado general)
+                .requestMatchers(HttpMethod.GET, "/api/health").permitAll()
+                // Health detallado solo para administradores
+                .requestMatchers(HttpMethod.GET, "/api/health/details").hasRole("ADMIN")
                 // Solo administradores
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Todo lo demás requiere autenticación

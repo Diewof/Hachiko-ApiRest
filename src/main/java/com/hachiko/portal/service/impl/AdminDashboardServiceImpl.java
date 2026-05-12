@@ -5,9 +5,12 @@ import com.hachiko.portal.dto.admin.DashboardStatsDTO;
 import com.hachiko.portal.repository.ILoginAttemptRepository;
 import com.hachiko.portal.repository.IUsuarioRepository;
 import com.hachiko.portal.service.IAdminDashboardService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static com.hachiko.portal.config.CacheConfig.CACHE_ADMIN_STATS;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -41,6 +44,7 @@ public class AdminDashboardServiceImpl implements IAdminDashboardService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = CACHE_ADMIN_STATS, key = "'global'")
     public DashboardStatsDTO getDashboardStats() {
         LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
         LocalDateTime startOfTomorrow = startOfToday.plusDays(1);

@@ -1,0 +1,12 @@
+target/
+.git/
+.github/
+.vscode/
+.claude/
+FrontEnd/
+pruebas-k6/
+Documentacion/
+*.md
+.env
+.env.*
+!.env.example
